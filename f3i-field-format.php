@@ -1,7 +1,7 @@
 <?php
 /*
 
-Plugin Name: Forms-3rdparty Submission Format
+Plugin Name: Forms-3rdparty Submission Reformat
 Plugin URI: https://github.com/zaus/forms-3rdparty-submission-format
 Description: Reformat specific field submission
 Author: zaus
