@@ -1,38 +1,46 @@
-=== Forms: 3rd-Party Submission Reformat ===
+=== Cookielander ===
 Contributors: zaus
 Donate link: http://drzaus.com/donate
-Tags: contact form, form, contact form 7, CF7, gravity forms, GF, CRM, mapping, 3rd-party service, services, remote request, reformat, date format, field format
+Tags: contact form, ppc, landing page, cookies, landing referrer, referral
 Requires at least: 3.0
 Tested up to: 4.3
 Stable tag: trunk
 License: GPLv2 or later
 
-Customize specific Forms-3rdparty submission fields' format.
+Save referral variables to temporary storage (cookies)
 
 == Description ==
 
-Allows you to customize the formatting of specific submission fields before mapping to a 3rdparty service endpoint with [Forms 3rdparty Integration](http://wordpress.org/plugins/forms-3rdparty-integration/).
-
-For example, can be used to reformat a Gravity Form or Contact Form 7 'date' field before sending it to a CRM.
+Allows you to specify which querystring parameters to save to temporary storage for use elsewhere in the site.  Great for capturing referral variables (GET querystring parameters, headers) and reusing them in contact forms, CRMs, etc.
 
 == Installation ==
 
 1. Unzip/upload plugin folder to your plugins directory (`/wp-content/plugins/`)
 2. Make sure [Forms 3rdparty Integration](http://wordpress.org/plugins/forms-3rdparty-integration/) is installed and settings have been saved at least once.
 3. Activate this plugin
-4. Choose which fields to reformat, as they appear in the 'mapping' column
-5. Provide one or more regular expression patterns to find and replace, like `/(\d+)\/(\d+)\/(\d+)/` to change the date from 'dd/mm/yyyy'
-6. Provide one or more regular expression replacement patterns to replace, like `$2-$1-$3` to change the date to 'mm-dd-yyyy'
+4. Determine which what referral variables to look for:
+   * in the querystring
+   * in headers
+5. List them out in JSON format, like
+
+    [
+      { 'get': 'url-parameter-1', 'cookie': null },
+      { 'get': 'url-parameter-2', 'cookie': 'some-other-name' },
+      { 'header': 'x-referral', 'cookie': 'crm.xref' },
+      { 'get': 'ref', 'cookie': 'crm.ref' },
+    ]
+
+6. The above will save:
+   * the querystring parameter (like `?url-parameter-1=VALUE`) to a cookie of the same name
+   * the querystring parameter `url-parameter-2` to a cookie named `some-other-name`
+   * the request header `x-referral` to a cookie named `crm` whose value is an array, at key `xref`
+   * the querystring parameter `ref` to the same cookie above at key `ref`
 
 == Frequently Asked Questions ==
 
-= How do I write a regex? =
-
-Sorry, you'll have to learn that the hard way...
-
 = It doesn't work right... =
 
-Drop an issue at https://github.com/zaus/forms-3rdparty-submission-format
+Drop an issue at https://github.com/zaus/cookielander
 
 == Screenshots ==
 
@@ -40,10 +48,7 @@ N/A.
 
 == Changelog ==
 
-= 0.2 =
-* refactored to generic, settings-enabled
-
 = 0.1 =
-* targeting specific fields and replacement formats
+* started
 
 == Upgrade Notice ==

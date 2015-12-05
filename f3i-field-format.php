@@ -1,21 +1,19 @@
 <?php
 /*
 
-Plugin Name: Forms-3rdparty Submission Reformat
-Plugin URI: https://github.com/zaus/forms-3rdparty-submission-format
-Description: Reformat specific field submission
+Plugin Name: Cookie-Lander
+Plugin URI: https://github.com/zaus/cookielander
+Description: Save referral variables to temporary storage (cookies)
 Author: zaus
-Version: 0.2
+Version: 0.1
 Author URI: http://drzaus.com
 Changelog:
 	0.1	initial
-	0.2 options-based
 */
 
-class F3iFieldFormat {
+class Cookielander {
 
-	const N = 'F3iFieldFormat';
-	const B = 'Forms3rdPartyIntegration';
+	const N = 'Cookielander';
 
 	public function __construct() {
 		// hook early to clean stuff out before other plugins
@@ -23,13 +21,13 @@ class F3iFieldFormat {
 	}
 
 	public function field_format($submission, $form, $service) {
-		$settings = F3iFieldFormatOptions::settings();
+		$settings = CookielanderOptions::settings();
 
-		$fields = explode(F3iFieldFormatOptions::FIELD_DELIM, $settings[F3iFieldFormatOptions::F_FIELDS]);
+		$fields = explode(CookielanderOptions::FIELD_DELIM, $settings[CookielanderOptions::F_FIELDS]);
 
 		// regex - pattern, replace
-		$pattern = explode(F3iFieldFormatOptions::REGEX_DELIM, $settings[F3iFieldFormatOptions::F_PATTERNS]); // '/(\d+)\/(\d+)\/(\d+)/';
-		$replace = explode(F3iFieldFormatOptions::REGEX_DELIM, $settings[F3iFieldFormatOptions::F_REPLACEMENTS]); //'$2-$1-$3';
+		$pattern = explode(CookielanderOptions::REGEX_DELIM, $settings[CookielanderOptions::F_PATTERNS]); // '/(\d+)\/(\d+)\/(\d+)/';
+		$replace = explode(CookielanderOptions::REGEX_DELIM, $settings[CookielanderOptions::F_REPLACEMENTS]); //'$2-$1-$3';
 
 		### _log('bouwgenius-date', $fields, $submission); 
 
@@ -48,7 +46,7 @@ class F3iFieldFormat {
 }//---	class	BouwgeniusDateFormat
 
 // engage!
-new F3iFieldFormat();
+new Cookielander();
 
-require('f3i-ff-options.php');
-new F3iFieldFormatOptions(__FILE__);
+require('cookielander-options.php');
+new CookielanderOptions(__FILE__);
