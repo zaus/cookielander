@@ -12,105 +12,112 @@ class CookielanderOptions {
 	/**
 	 * Who can use it
 	 */
-	var $capability = 'general'; // general, manage_options
+	var $capability = 'manage_options'; // general, manage_options
 
 	/**
 	 * Namespace
 	 */
 	const N = 'cookielander';
 
-	/**
-	 * Settings option group
-	 * 
-	 * @remarks don't necessarily need to change
-	 */
-	const OPTION_GROUP = 'pluginPage';
-
 	#endregion ------------- customization --------------
 
 
 	#region ------- fields etc ----------
 
-	const FIELD_DELIM = ',';
-	const REGEX_DELIM = '|||';
+	const F_RAW = 'json';
 
-	const F_FIELDS = 'fields';
-	const F_PATTERNS = 'patterns';
-	const F_REPLACEMENTS = 'replacements';
+	function add_settings($page) {
 
-
-	function add_settings($group) {
-
-		$section = 'f3i_ff_pluginPage_section';
+		$section = implode('_', array(static::N, static::N/**/, 'section'));
 
 		add_settings_section(
 			$section,
-			__( 'Field Formatting Replacement', static::X ), 
+			__( 'Raw Configuration', static::X ), 
 			array(&$this, 'section'), 
-			$group
+			$page
 		);
 
 		add_settings_field( 
-			self::F_FIELDS, 
-			__( 'Submission Field Name(s)', static::X ), 
-			array(&$this, 'render_names'), 
-			$group, 
-			$section 
-		);
-
-		add_settings_field( 
-			self::F_PATTERNS, 
-			__( 'Given Format (regex pattern)', static::X ), 
-			array(&$this, 'render_pattern'), 
-			$group, 
-			$section 
-		);
-
-		add_settings_field( 
-			self::F_REPLACEMENTS, 
-			__( 'Expected Format (regex replacement)', static::X ), 
-			array(&$this, 'render_replace'), 
-			$group, 
+			self::F_RAW, 
+			__( 'Raw JSON', static::X ), 
+			array(&$this, 'render_raw'), 
+			$page, 
 			$section 
 		);
 	}
 
 
 	function section(  ) { 
-		echo '<p>', __( 'Enter the field name(s), comma-separated, which will be parsed and rearranged according to the given patterns and replacements.', static::X ), '</p>';
-		echo '<p>', sprintf( __( 'Separate multiple patterns and replacements with %s', static::X ), '<code>' . self::REGEX_DELIM . '</code>'), '</p>';
-	}
-
-	function render_names(  ) { 
-		$this->renderInput(self::F_FIELDS);
-	}
-
-
-	function render_pattern(  ) { 
-		$this->renderInput(self::F_PATTERNS);
-		?>
-		<p><em>Example:</em> <code>/(\d+)\/(\d+)\/(\d+)/</code><p>
+		?><p><?php _e( 'Determine which what referral variables to look for: in the querystring, in headers.', static::X ) ?></p>
+		<p><?php _e('List them out in JSON format, like:', static::X) ?>
+			<pre>
+[
+	{ "get": "url-parameter-1", "cookie": null },
+	{ "get": "url-parameter-2", "cookie": "some-other-name" },
+	{ "header": "x-referral", "cookie": "crm.xref" },
+	{ "get": "ref", "cookie": "crm.ref" }
+]
+			</pre>
+		</p>
+		<p>The above will save:
+<br /> * the querystring parameter (like `?url-parameter-1=VALUE`) to a cookie of the same name
+<br /> * the querystring parameter `url-parameter-2` to a cookie named `some-other-name`
+<br /> * the request header `x-referral` to a cookie named `crm` whose value is an array, at key `xref`
+<br /> * the querystring parameter `ref` to the same cookie above at key `ref`
+		</p>
 		<?php
-
 	}
 
+	function render_raw(  ) {
+		// dump all the setings out as JSON
 
-	function render_replace(  ) { 
-		$this->renderInput(self::F_REPLACEMENTS);
+		$field = self::F_RAW;
+		$options = self::settings();
+
+		// TODO: codemirror...
 		?>
-		<p><em>Example:</em> <code>$2-$1-$3</code><p>
+		<textarea class='large-text code' rows='10' name='<?php echo static::N, '[', $field ?>]'><?php echo esc_html(json_encode($options, JSON_PRETTY_PRINT)); ?></textarea>
 		<?php
+	}
 
+	function sanitize($val) {
+		### _log('sanitizing ' . static::N . '.' . self::F_RAW, $val);
+
+		// pull out json and turn into array
+		$newval = json_decode($val[self::F_RAW], true);
+
+		### _log('sanitized ' . static::N . '.' . self::F_RAW, $val);
+
+		// okay?
+		$error = json_last_error();
+		if($error === JSON_ERROR_NONE) return $newval;
+
+		add_settings_error(
+			// setting name
+			static::N,
+			// html id
+			static::N,
+			// what went wrong
+			sprintf(__('Invalid JSON (code %s)', static::X), $error),
+			// css class: error, updated
+			'error'
+		);
+		$this->failed();
+
+		return $val;
 	}
 
 	#endregion ------- fields etc ----------
 
 
 
+
+
+
 	#region ------------- settings, singleton --------------
 
 	public static function settings() {
-		return get_option( instance()->N );
+		return get_option( static::N );
 	}
 
 	private static $instance;
@@ -130,10 +137,21 @@ class CookielanderOptions {
 	}
 	#endregion ------------- settings, singleton --------------
 
+	/**
+	 * Plugin options 'root' path (<c>__FILE__</c>), used to create plugin listing settings link
+	 */
 	var $root;
 
-	protected function __construct($root) {
+	/**
+	 * Create a new instance of the plugin; consider also the singleton <c>::instance($root)</c> instead
+	 * @remarks technically should be `private`
+	 */
+	public function __construct($root) {
 		$this->root = $root;
+
+		if(!is_admin()) return;
+
+		// TODO: multisite? https://codex.wordpress.org/Creating_Options_Pages#Pitfalls
 		add_action( 'admin_menu', array(&$this, 'add_admin_menu') );
 		add_action( 'admin_init', array(&$this, 'settings_init') );
 	}
@@ -145,7 +163,7 @@ class CookielanderOptions {
 			// menu title
 			$this->menu_title,
 			// access
-			$this->CAPABILITy,
+			$this->capability,
 			// namespace/option
 			static::N,
 			// callback
@@ -177,9 +195,9 @@ class CookielanderOptions {
 
 
 	function settings_init(  ) { 
-		register_setting( static::OPTION_GROUP, static::N/*, sanitize_callback */ );
+		register_setting( static::N/**/, static::N, array(&$this, 'sanitize') );
 
-		$this->add_settings(static::OPTION_GROUP);
+		$this->add_settings(static::N/**/);
 	}//--	settings_init
 
 
@@ -191,8 +209,8 @@ class CookielanderOptions {
 			<h2><?php _e($this->title, static::X) ?></h2>
 			
 			<?php
-			settings_fields( static::OPTION_GROUP );
-			do_settings_sections( static::OPTION_GROUP );
+			settings_fields( static::N/**/ );
+			do_settings_sections( static::N/**/ );
 			submit_button();
 			?>
 			
@@ -201,12 +219,28 @@ class CookielanderOptions {
 
 	}
 
+	function failed() {
+		add_action( 'admin_notices', array(&$this, 'option_failed') );
+	}
+	function option_failed() {
+		settings_errors(static::N);
+	}
+
+
 
 
 	protected function renderInput($field) {
 		$options = self::settings();
 		?>
-		<input type='text' name='<?php echo static::N, '[', $field ?>]' value='<?php echo $options[$field]; ?>'>
+		<input type='text' class='regular-text' name='<?php echo static::N, '[', $field ?>]' value='<?php echo $options[$field]; ?>'>
+		<?php
+	}
+	protected function renderText($field) {
+		$options = self::settings();
+
+		// TODO: codemirror...
+		?>
+		<textarea class='large-text code' rows='10' name='<?php echo static::N, '[', $field ?>]'><?php echo esc_html($options[$field]); ?></textarea>
 		<?php
 	}
 
