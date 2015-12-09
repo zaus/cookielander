@@ -28,8 +28,19 @@ class Cookielander {
 
 		_log(__CLASS__, $settings);
 
-		
+		// foreach
+		// if session
+		$this->start_session();
+
+
 	}//--	fn	date_format
+
+
+	function start_session() {
+		// http://silvermapleweb.com/using-the-php-session-in-wordpress/
+		if (!session_id()) session_start();
+	}
+
 }//---	class	BouwgeniusDateFormat
 
 // engage!
