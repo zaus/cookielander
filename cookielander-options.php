@@ -27,9 +27,10 @@ class CookielanderOptions {
 	const F_RAW = 'json';
 
 	function add_settings($page) {
-
+		add_action( 'admin_enqueue_scripts', array(&$this, 'scripts') );
+		
 		$section = implode('_', array(static::N, static::N/**/, 'section'));
-
+			
 		add_settings_section(
 			$section,
 			__( 'Raw Configuration', static::X ), 
@@ -45,26 +46,29 @@ class CookielanderOptions {
 			$section 
 		);
 	}
+	
+	function scripts() {
+		wp_enqueue_script( 'ractive', '//cdn.ractivejs.org/latest/ractive.js', null, '0.8', false );
+		wp_enqueue_script( 'ractive-addable', plugins_url('/Ractive-decorators-addable.js', __FILE__), array('ractive'), '1.0', false );
+		wp_enqueue_script( static::N, plugins_url('/cookielander.js', __FILE__), array('ractive', 'ractive-addable'), '1.0', false );
+		wp_localize_script( static::N, 'cookielander', array(
+			'n' => static::N,
+			'keyRaw' => self::F_RAW,
+			'dataSrc' => sprintf('[name="%s[%s]"]', static::N, self::F_RAW),
+		));
+	}
 
 
-	function section(  ) { 
-		?><p><?php _e( 'Determine which what referral variables to look for: in the querystring, in headers.', static::X ) ?></p>
-		<p><?php _e('List them out in JSON format, like:', static::X) ?>
-			<pre>
-[
-	{ "get": "url-parameter-1", "cookie": null },
-	{ "get": "url-parameter-2", "cookie": "some-other-name" },
-	{ "header": "x-referral", "cookie": "crm.xref" },
-	{ "get": "ref", "cookie": "crm.ref" }
-]
-			</pre>
-		</p>
-		<p>The above will save:
-<br /> * the querystring parameter (like `?url-parameter-1=VALUE`) to a cookie of the same name
-<br /> * the querystring parameter `url-parameter-2` to a cookie named `some-other-name`
-<br /> * the request header `x-referral` to a cookie named `crm` whose value is an array, at key `xref`
-<br /> * the querystring parameter `ref` to the same cookie above at key `ref`
-		</p>
+	function section(  ) {
+		include('cookielander-ui.php');
+		?>
+		<script>
+			(function($) {
+				$(function() {
+					cookielander.editor = cookielander.init(cookielander);
+				});
+			})(jQuery);
+		</script>
 		<?php
 	}
 
@@ -185,7 +189,7 @@ class CookielanderOptions {
 	
 		$url = esc_url_raw(admin_url('options-general.php?page=' . static::N));
 	
-		$settings_link = '<a title="Capability ' . $this->CAPABILITy . ' required" href="' . esc_attr( $url ) . '">'
+		$settings_link = '<a title="Capability ' . $this->capability . ' required" href="' . esc_attr( $url ) . '">'
 			. esc_html( __( 'Settings', static::X ) ) . '</a>';
 	
 		array_unshift( $links, $settings_link );
