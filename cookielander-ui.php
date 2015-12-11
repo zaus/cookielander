@@ -1,6 +1,6 @@
 <p><?php _e( 'Determine which what referral variables to look for: in the querystring, in headers.', static::X ) ?></p>
 
-<div class="raw">
+<div class="developers raw hidden">
 	<p><?php _e('List them out in JSON format, like:', static::X) ?>
 		<pre><?php
 		
@@ -67,27 +67,29 @@
 					<span class="row-actions"></span>
 				</th>
 				<td>
-					<table>
+					<table class="form-table">
 						<tr>
-							<th scope="row">Source</th>
+							<th scope="row"><label for='src-{{@index}}'>Source</label></th>
 							<td>	
 								<div class="radios">
 									<label><input type='radio' value='get' checked name='{{.src_t}}' /> <b>Get</b></label>
 									<label><input type='radio' value='header' name='{{.src_t}}' /> <b>Header</b></label>
 								</div>
 									
-								<label><b>Key:</b> <input value='{{.src}}' /></label>
+								<label><b>Key:</b> <input id='src-{{@index}}' value='{{.src}}' /></label>
 							</td>
 						</tr>
 						<tr>
-							<th scope="row">Destination</th>
+							<th scope="row"><label for='dest-{{@index}}'>Destination</label></th>
 							<td>	
 								<div class="radios">
-									<label><input type='radio' value='get' checked name='{{.dest_t}}' /> <b>Session</b></label>
-									<label><input type='radio' value='header' name='{{.dest_t}}' /> <b>Cookie</b></label>
+									<label><input type='radio' value='session' checked name='{{.dest_t}}' /> <b>Session</b></label>
+									<label><input type='radio' value='cookie' name='{{.dest_t}}' /> <b>Cookie</b></label>
 								</div>
 									
-								<label><b>Key:</b> <input value='{{.dest}}' /></label>
+								<label><b>Key:</b> <input id='dest-{{@index}}' value='{{.dest}}' /></label>
+								
+								<p><em>Leave blank to reuse 'Source' key</em></p>
 							</td>
 						</tr>
 					</table>

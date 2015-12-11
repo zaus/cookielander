@@ -16,7 +16,7 @@
 			return JSON.parse($rawEditor.val());
 		}
 		function setRaw(val) {
-			$rawEditor.val(JSON.stringify(val));
+			$rawEditor.val(JSON.stringify(val, null, 4));
 		}
 		
 
