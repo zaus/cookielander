@@ -225,7 +225,7 @@ class CookielanderOptions {
 		?>
 		<form action='options.php' method='post'>
 			
-			<h2><?php _e($this->title, static::X) ?></h2>
+			<h1><?php _e($this->title, static::X) ?></h1>
 			
 			<?php
 			settings_fields( static::N/**/ );

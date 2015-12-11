@@ -1,4 +1,4 @@
-<p><?php _e( 'Determine which what referral variables to look for: in the querystring, in headers.', static::X ) ?></p>
+<p><?php _e( 'Determine which \'referral\' variables to look for: in the querystring, in headers, etc, and where to save them.', static::X ) ?></p>
 
 <div class="developers raw hidden">
 	<p><?php _e('List them out in JSON format, like:', static::X) ?>
