@@ -17,9 +17,10 @@ class Cookielander {
 	const N = 'Cookielander';
 
 	public function __construct() {
+		require('cookielander-options.php');
+
 		// only on frontend pages
 		if(is_admin()) {
-			require('cookielander-options.php');
 			CookielanderOptions::instance(__FILE__);
 			return;
 		}
@@ -43,7 +44,7 @@ class Cookielander {
 		$headersDest = array();
 		
 		foreach($settings[CookielanderOptions::F_RAW] as $i => $setting) {
-			explode($setting); // easier access
+			extract($setting); // easier access
 			
 			switch($src_t) {
 				case 'req':
