@@ -18,7 +18,11 @@ class Cookielander {
 
 	public function __construct() {
 		// only on frontend pages
-		if(is_admin()) return;
+		if(is_admin()) {
+			require('cookielander-options.php');
+			CookielanderOptions::instance(__FILE__);
+			return;
+		}
 
 		add_action('init', array(&$this, 'trap'));
 	}
@@ -84,7 +88,7 @@ class Cookielander {
 			}
 			if(!empty($headersDest)) {
 				$this->headersToSet = $headersDest;
-				add_filter('wp_headers', array(&$this, 'set_headers'));
+				add_action('send_headers', array(&$this, 'set_headers'));
 			}
 			if(!empty($cookiesDest)) {
 				$this->set_cookies($cookiesDest);
@@ -109,13 +113,16 @@ class Cookielander {
 	}
 	
 	
-	function set_headers($headers, $wpclass) {
-		throw new Exception('NotImplemented');
+	function set_headers() {
+		// `send_headers`, not `wp_headers` -- http://wordpress.stackexchange.com/questions/20192/wp-function-filter-for-modifying-http-headers
+		foreach($this->headersToSet as $k => $v) {
+			header("$k: $v");
+		}
 	}
 	
 	function set_session($sessions) {
-		
-				throw new Exception('NotImplemented');
+		// do we need to destroy them later? http://silvermapleweb.com/using-the-php-session-in-wordpress/
+		$_SESSION = array_merge($_SESSION, $sessions);
 	}
 	
 	function set_cookies($cookies) {
@@ -146,6 +153,3 @@ class Cookielander {
 
 // engage!
 new Cookielander();
-
-require('cookielander-options.php');
-CookielanderOptions::instance(__FILE__);

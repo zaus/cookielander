@@ -166,9 +166,9 @@ class CookielanderOptions {
 	 * @remarks technically should be `private`
 	 */
 	public function __construct($root) {
-		$this->root = $root;
-
 		if(!is_admin()) return;
+		
+		$this->root = $root;
 
 		// TODO: multisite? https://codex.wordpress.org/Creating_Options_Pages#Pitfalls
 		add_action( 'admin_menu', array(&$this, 'add_admin_menu') );
