@@ -18,23 +18,17 @@ Allows you to specify which querystring parameters to save to temporary storage 
 1. Unzip/upload plugin folder to your plugins directory (`/wp-content/plugins/`)
 2. Make sure [Forms 3rdparty Integration](http://wordpress.org/plugins/forms-3rdparty-integration/) is installed and settings have been saved at least once.
 3. Activate this plugin
-4. Determine which what referral variables to look for:
-   * in the querystring
+4. Determine which referral variables to look for:
+   * in the querystring or post ("request")
    * in headers
-5. List them out in JSON format, like
-
-    [
-      { 'get': 'url-parameter-1', 'cookie': null },
-      { 'get': 'url-parameter-2', 'cookie': 'some-other-name' },
-      { 'header': 'x-referral', 'cookie': 'crm.xref' },
-      { 'get': 'ref', 'cookie': 'crm.ref' },
-    ]
-
-6. The above will save:
-   * the querystring parameter (like `?url-parameter-1=VALUE`) to a cookie of the same name
-   * the querystring parameter `url-parameter-2` to a cookie named `some-other-name`
-   * the request header `x-referral` to a cookie named `crm` whose value is an array, at key `xref`
-   * the querystring parameter `ref` to the same cookie above at key `ref`
+   * in cookies
+5. Determine where to save those variables:
+   * in the session
+   * in a cookie
+   * in a header
+6. If saving to a cookie, you may:
+	* leave the destination key blank to reuse the source key
+	* specify 'name', 'path', 'domain', 'expires', etc by entering them as url-querystring format corresponding to the [`setcookie` parameters](http://php.net/manual/en/function.setcookie.php).  ex `name=foobar@expires=700000`.
 
 == Frequently Asked Questions ==
 
@@ -47,6 +41,11 @@ Drop an issue at https://github.com/zaus/cookielander
 N/A.
 
 == Changelog ==
+
+= 0.4 =
+* dynamic UI
+* reads from bunch of sources
+* saves to a bunch of destinations
 
 = 0.1 =
 * started
