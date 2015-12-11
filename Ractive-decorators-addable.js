@@ -3,7 +3,7 @@
 	Ractive-decorators-addable
 	===========================
 
-	Version <%= VERSION %>.
+	Version 0.1.2.
 
 	This plugin adds a 'addable' decorator to Ractive, which enables
 	elements that correspond to array members to be added and removed.
@@ -67,12 +67,12 @@ var addableDecorator = (function (global, factory) {
 		factory(require('Ractive'));
 	}
 
-		// AMD?
+	// AMD?
 	else if (typeof define === 'function' && define.amd) {
 		define(['Ractive'], factory);
 	}
 
-		// browser global
+	// browser global
 	else if (global.Ractive) {
 		factory(global.Ractive);
 	}
@@ -128,7 +128,7 @@ var addableDecorator = (function (global, factory) {
 		btnRemove = btnRemove = btnCreate(options.elementName, node, remHandler, options.remText, options.remClass, options.remTitle);
 
 		// try to append, otherwise add
-		styleAdd(options.remStyle, btnRemove, node, parent);
+		styleAdd(options.remStyle || 'inner', btnRemove, node, parent);
 
 		return {
 			teardown: function () {
@@ -152,11 +152,15 @@ var addableDecorator = (function (global, factory) {
 	addable.elementName = 'span';
 	addable.addTitle = addable.addText = 'Add';
 	addable.addClass = 'btn add';
-	addable.addStyle = 'prepend'; // append, prepend; copy? -- UI doesn't really respect this when no more elements left
+	addable.addStyle = 'prepend'; // selector or 'append', 'prepend'; copy? -- UI doesn't really respect this when no more elements left
 	addable.remTitle = addable.remText = 'Delete';
 	addable.remClass = 'btn delete';
-	addable.remStyle = 'inner'; // inner|child,next|sibling
+	addable.remStyle = 'inner'; // selector or inner|child,next|sibling
 	addable.allAdd = false;
+
+	// style selector "hacks" for navigating up the DOM
+	addable.rootSelector = '$';
+	addable.parentSelector = '^';
 
 	//#region ----- utilities ----------
 	btnCreate = function (el, node, handler, text, clss, title) {
@@ -201,8 +205,18 @@ var addableDecorator = (function (global, factory) {
 				break;
 				// any selector
 			default:
+				// root "selector" hack
+				if(style.charAt(0) == addable.rootSelector) {
+					style = style.substring(1);
+					node = document;
+				}
+				// parent "selector" hack
+				else while (style.charAt(0) == addable.parentSelector) {
+					style = style.substring(1);
+					node = node.parentNode;
+				}
 				var found = node.querySelector(style);
-				if (!found) throw new Error("Couldn't locate decorator addable 'style' to attach to in `node`");
+				if (!found) throw new Error("Couldn't locate decorator addable 'style' (" + style + ") to attach to in `node`");
 				found.appendChild(newNode);
 				break;
 		}

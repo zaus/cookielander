@@ -49,32 +49,58 @@
 
 
 <script id="t-editor" type="text/template">
-	<a class="button" on-click="toggleRaw()">Toggle Raw</a>
-	
-	<section>
-		{{#each items}}
-			<div decorator="addable">
-				<fieldset class="control-group radios">
-					<legend>Source</legend>
-					
-					<label><input type='radio' value='get' name='{{.src_t}}' /> <b>Get</b></label>
-					<label><input type='radio' value='header' name='{{.src_t}}' /> <b>Header</b></label>
-				</fieldset>
-				<label><b>Source Key:</b> <input value='{{.src}}' /></label>
-				
-				<fieldset class="control-group radios">
-					<legend>Destination</legend>
-					
-					<label><input type='radio' value='session' name='{{.dest_t}}' /> <b>Session</b></label>
-					<label><input type='radio' value='cookie' name='{{.dest_t}}' /> <b>Cookie</b></label>
-				</fieldset>
-				<label><b>Destination Key:</b> <input value='{{.dest}}' /></label>
-			</div>
-		{{/each}}
-		{{^items}}
-			<a on-click="(items = [])" class="btn add"><i></i></a>
-		{{/items}}
+	<a class="button" on-click="toggleRaw()">Toggle {{#showRaw}}Editor{{else}}Raw{{/}}</a>
 
-	</section>
-	
+	<table class="wp-list-table widefat fixed striped {{#showRaw}}hidden{{/}}">
+		<thead>
+			<tr>
+				<th scope="col" class="column-links">#</th>
+				<th scope="col">Entry <span class="header-actions"></span></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{{#items}}
+			<tr decorator="addable">
+				<th scope="row" class="column-links">
+					<strong>{{@index+1}}: </strong>
+					<span class="row-actions"></span>
+				</th>
+				<td>
+					<table>
+						<tr>
+							<th scope="row">Source</th>
+							<td>	
+								<div class="radios">
+									<label><input type='radio' value='get' checked name='{{.src_t}}' /> <b>Get</b></label>
+									<label><input type='radio' value='header' name='{{.src_t}}' /> <b>Header</b></label>
+								</div>
+									
+								<label><b>Key:</b> <input value='{{.src}}' /></label>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">Destination</th>
+							<td>	
+								<div class="radios">
+									<label><input type='radio' value='get' checked name='{{.dest_t}}' /> <b>Session</b></label>
+									<label><input type='radio' value='header' name='{{.dest_t}}' /> <b>Cookie</b></label>
+								</div>
+									
+								<label><b>Key:</b> <input value='{{.dest}}' /></label>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			{{else}}
+			<tr>
+				<td colspan=2>
+					<a on-click="(items = [])" class="btn add"><i></i></a>
+				</td>
+			</tr>
+			{{/items}}
+
+		</tbody>
+	</table>
 </script>

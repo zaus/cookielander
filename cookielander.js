@@ -7,13 +7,6 @@
 		var keyShowRaw = 'showRaw',
 			keyItems = 'items';
 		
-		var d = $.extend({
-			items: getRaw(),
-			showRaw: false
-		}, options);
-		
-
-		
 		//#region -------- DOM setup, helper functions --------------
 		
 		function toggleEditor(show) {
@@ -33,13 +26,25 @@
 		$('#submit').on('click', function () {
 			if(!editor.get(keyShowRaw)) setRaw(editor.get(keyItems));
 		})
-		
+
+		// prepare ractive data
+		var d = $.extend({
+			items: getRaw(),
+			showRaw: false
+		}, options);
+				
 		// initial state - hide raw in favor of showing editor
 		toggleEditor(d[keyShowRaw]);
 		
 		//#endregion -------- DOM setup, helper functions --------------
 		
-
+		var addableDecorator = Ractive.decorators.addable;
+		// wp styling
+		addableDecorator.addClass = addableDecorator.addClass.replace('btn', 'button');
+		addableDecorator.remClass = addableDecorator.remClass.replace('btn', 'button');
+		// in a table
+		addableDecorator.addStyle = addableDecorator.rootSelector + ' .header-actions';
+		addableDecorator.remStyle = '.row-actions';
 		
 		console.log('cookielander source data:', d);
 		
