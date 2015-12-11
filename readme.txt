@@ -11,7 +11,7 @@ Save referral variables to temporary storage (cookies)
 
 == Description ==
 
-Allows you to specify which querystring parameters to save to temporary storage for use elsewhere in the site.  Great for capturing referral variables (GET querystring parameters, headers) and reusing them in contact forms, CRMs, etc.
+Allows you to specify which querystring, post, header, or cookie parameters to save to temporary storage (session, another cookie, header) for use elsewhere in the site.  Great for capturing referral variables (GET querystring parameters, headers) and reusing them in contact forms, CRMs, etc.
 
 == Installation ==
 
