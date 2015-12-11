@@ -31,7 +31,7 @@ class Cookielander {
 	public function trap() {
 		$settings = CookielanderOptions::settings();
 		
-		_log(__CLASS__, $settings);
+		### _log(__CLASS__, $settings);
 
 		// nothing to do...leave
 		if(empty($settings) || !isset($settings[CookielanderOptions::F_RAW]) || empty($settings[CookielanderOptions::F_RAW])) return;
@@ -65,38 +65,38 @@ class Cookielander {
 			
 			if(!isset($source[$src])) continue;
 			$sourceVal = $source[$src];
-			
+
 			switch($dest_t) {
 				case 'cookie':
-					$targetDest = $cookiesDest;
+					$targetDest = &$cookiesDest;
 					break;
 				case 'session':
-					$targetDest = $sessionDest;
+					$targetDest = &$sessionDest;
 					break;
 				case 'header':
-					$targetDest = $headersDest;
+					$targetDest = &$headersDest;
 					break;
 				default:
-					$targetDest = $emptySource;
+					$targetDest = &$emptySource;
 					break;
 			}
 			
-			$targetDest[$dest] = $sourceVal;
-						
-			if(!empty($sessionDest)) {
-				$this->start_session();
-				$this->set_session($sessionDest);
-			}
-			if(!empty($headersDest)) {
-				$this->headersToSet = $headersDest;
-				add_action('send_headers', array(&$this, 'set_headers'));
-			}
-			if(!empty($cookiesDest)) {
-				$this->set_cookies($cookiesDest);
-			}
+			$targetDest[empty($dest) ? $src : $dest] = $sourceVal;
 		}
-
-
+		
+		### _log($settings, array('session' => $sessionDest, 'headers' => $headersDest, 'cookies' => $cookiesDest));
+		
+		if(!empty($sessionDest)) {
+			$this->start_session();
+			$this->set_session($sessionDest);
+		}
+		if(!empty($headersDest)) {
+			$this->headersToSet = $headersDest;
+			add_action('send_headers', array(&$this, 'set_headers'));
+		}
+		if(!empty($cookiesDest)) {
+			$this->set_cookies($cookiesDest);
+		}
 	}//--	fn	trap
 
 	function getheaders() {
@@ -135,7 +135,7 @@ class Cookielander {
 				'name' => $path,
 				'expire' => $expires,
 				'path' => COOKIEPATH,
-				'domain' => COOKIEDOMAIN,
+				'domain' => COOKIE_DOMAIN,
 				'secure' => 'false',
 				'httponly' => 'true'
 			));
