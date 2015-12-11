@@ -25,7 +25,8 @@ class CookielanderOptions {
 	#region ------- fields etc ----------
 
 	const F_RAW = 'json';
-
+	const F_EXPIRES = 'expires';
+	
 	function add_settings($page) {
 		add_action( 'admin_enqueue_scripts', array(&$this, 'scripts') );
 		
@@ -33,9 +34,17 @@ class CookielanderOptions {
 			
 		add_settings_section(
 			$section,
-			__( 'Raw Configuration', static::X ), 
+			__( 'Configuration', static::X ), 
 			array(&$this, 'section'), 
 			$page
+		);
+
+		add_settings_field( 
+			self::F_EXPIRES, 
+			__( 'Default Cookie Expiration', static::X ), 
+			array(&$this, 'render_expires'), 
+			$page, 
+			$section 
 		);
 
 		add_settings_field( 
@@ -45,6 +54,7 @@ class CookielanderOptions {
 			$page, 
 			$section 
 		);
+		
 	}
 	
 	function scripts() {
@@ -80,21 +90,26 @@ class CookielanderOptions {
 
 		// TODO: codemirror...
 		?>
-		<textarea class='large-text code' rows='10' name='<?php echo static::N, '[', $field ?>]'><?php echo esc_html(json_encode($options, JSON_PRETTY_PRINT)); ?></textarea>
+		<textarea class='large-text code' rows='10' name='<?php echo static::N, '[', $field ?>]'><?php echo esc_html(json_encode($this->exist($options, $field, array()), JSON_PRETTY_PRINT)); ?></textarea>
 		<?php
+	}
+
+	function render_expires(  ) {
+		$this->renderInput(self::F_EXPIRES, 7 * DAY_IN_SECONDS);
+		echo '<em>seconds</em>';
 	}
 
 	function sanitize($val) {
 		### _log('sanitizing ' . static::N . '.' . self::F_RAW, $val);
 
 		// pull out json and turn into array
-		$newval = json_decode($val[self::F_RAW], true);
+		$val[self::F_RAW] = json_decode($val[self::F_RAW], true);
 
 		### _log('sanitized ' . static::N . '.' . self::F_RAW, $val);
 
 		// okay?
 		$error = json_last_error();
-		if($error === JSON_ERROR_NONE) return $newval;
+		if($error === JSON_ERROR_NONE) return $val;
 
 		add_settings_error(
 			// setting name
@@ -233,19 +248,23 @@ class CookielanderOptions {
 
 
 
-	protected function renderInput($field) {
+	protected function renderInput($field, $default = '') {
 		$options = self::settings();
 		?>
-		<input type='text' class='regular-text' name='<?php echo static::N, '[', $field ?>]' value='<?php echo $options[$field]; ?>'>
+		<input type='text' class='regular-text' name='<?php echo static::N, '[', $field ?>]' value='<?php echo esc_attr( $this->exist($options, $field, $default) ); ?>'>
 		<?php
 	}
-	protected function renderText($field) {
+	protected function renderText($field, $default = '') {
 		$options = self::settings();
 
 		// TODO: codemirror...
 		?>
-		<textarea class='large-text code' rows='10' name='<?php echo static::N, '[', $field ?>]'><?php echo esc_html($options[$field]); ?></textarea>
+		<textarea class='large-text code' rows='10' name='<?php echo static::N, '[', $field ?>]'><?php echo esc_html( $this->exist($options, $field, $default) ); ?></textarea>
 		<?php
+	}
+	
+	protected function exist($source, $key, $default = null) {
+		return isset($source[$key]) ? $source[$key] : $default;
 	}
 
 

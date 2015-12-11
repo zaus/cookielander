@@ -25,15 +25,116 @@ class Cookielander {
 
 	public function trap() {
 		$settings = CookielanderOptions::settings();
-
+		
 		_log(__CLASS__, $settings);
 
-		// foreach
-		// if session
-		$this->start_session();
+		// nothing to do...leave
+		if(empty($settings) || !isset($settings[CookielanderOptions::F_RAW]) || empty($settings[CookielanderOptions::F_RAW])) return;
+
+		$headerSource = false; // populate on first request
+		$emptySource = array(); // if invalid option selected
+		
+		$cookiesDest = array();
+		$sessionDest = array();
+		$headersDest = array();
+		
+		foreach($settings[CookielanderOptions::F_RAW] as $i => $setting) {
+			explode($setting); // easier access
+			
+			switch($src_t) {
+				case 'req':
+				case 'get':
+					$source = $_REQUEST; // WP already combined get/post
+					break;
+				case 'header':
+					if($headerSource === false) $headerSource = $this->getheaders(); // populate on first request
+					$source = $headerSource;
+					break;
+				case 'cookie':
+					$source = $_COOKIE;
+					break;
+				default:
+					$source = $emptySource;
+					break;
+			}
+			
+			if(!isset($source[$src])) continue;
+			$sourceVal = $source[$src];
+			
+			switch($dest_t) {
+				case 'cookie':
+					$targetDest = $cookiesDest;
+					break;
+				case 'session':
+					$targetDest = $sessionDest;
+					break;
+				case 'header':
+					$targetDest = $headersDest;
+					break;
+				default:
+					$targetDest = $emptySource;
+					break;
+			}
+			
+			$targetDest[$dest] = $sourceVal;
+						
+			if(!empty($sessionDest)) {
+				$this->start_session();
+				$this->set_session($sessionDest);
+			}
+			if(!empty($headersDest)) {
+				$this->headersToSet = $headersDest;
+				add_filter('wp_headers', array(&$this, 'set_headers'));
+			}
+			if(!empty($cookiesDest)) {
+				$this->set_cookies($cookiesDest);
+			}
+		}
 
 
-	}//--	fn	date_format
+	}//--	fn	trap
+
+	function getheaders() {
+		// or do we need to use the $_SERVER['HTTP_....'] trick?
+		// http://stackoverflow.com/questions/541430/how-do-i-read-any-request-header-in-php
+		if(function_exists('getallheaders')) return getallheaders();
+		
+		$headers = array();
+		// do we really need to handle the complicated capitalization fixing? ugh
+		foreach($_SERVER as $k => $v) {
+			$realKey = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($k, 5)))));
+			if(strpos($k, 'HTTP_') === 0) $headers[ $realKey ] = $v;
+		}
+		return $headers;
+	}
+	
+	
+	function set_headers($headers, $wpclass) {
+		throw new Exception('NotImplemented');
+	}
+	
+	function set_session($sessions) {
+		
+				throw new Exception('NotImplemented');
+	}
+	
+	function set_cookies($cookies) {
+		$expires = CookielanderOptions::settings()[CookielanderOptions::F_EXPIRES];
+		
+		foreach($cookies as $path => $value) {
+			//parse for path, expiration, etc
+			$args = wp_parse_args($path, array(
+				'name' => $path,
+				'expire' => $expires,
+				'path' => COOKIEPATH,
+				'domain' => COOKIEDOMAIN,
+				'secure' => 'false',
+				'httponly' => 'true'
+			));
+			
+			setcookie($args['name'], $value, time() + intval($args['expire']), $args['path'], $args['domain'], $args['secure'] === 'true', $args['httponly'] === 'true');			
+		}
+	}
 
 
 	function start_session() {

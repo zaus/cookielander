@@ -72,8 +72,10 @@
 							<th scope="row"><label for='src-{{@index}}'>Source</label></th>
 							<td>	
 								<div class="radios">
-									<label><input type='radio' value='get' checked name='{{.src_t}}' /> <b>Get</b></label>
+									<label><input type='radio' value='get' checked name='{{.src_t}}' /> <b>Request</b></label>
+									<label><input type='radio' value='cookie' name='{{.src_t}}' /> <b>Cookie</b></label>
 									<label><input type='radio' value='header' name='{{.src_t}}' /> <b>Header</b></label>
+
 								</div>
 									
 								<label><b>Key:</b> <input id='src-{{@index}}' value='{{.src}}' /></label>
@@ -85,6 +87,7 @@
 								<div class="radios">
 									<label><input type='radio' value='session' checked name='{{.dest_t}}' /> <b>Session</b></label>
 									<label><input type='radio' value='cookie' name='{{.dest_t}}' /> <b>Cookie</b></label>
+									<label><input type='radio' value='header' name='{{.dest_t}}' /> <b>Header</b></label>
 								</div>
 									
 								<label><b>Key:</b> <input id='dest-{{@index}}' value='{{.dest}}' /></label>
