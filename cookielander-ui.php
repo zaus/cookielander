@@ -101,7 +101,7 @@
 			{{else}}
 			<tr>
 				<td colspan=2>
-					<a on-click="(items = [])" class="btn add"><i></i></a>
+					<a on-click='push("items", {})' class="button add">Add</a>
 				</td>
 			</tr>
 			{{/items}}

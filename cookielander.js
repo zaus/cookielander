@@ -56,7 +56,7 @@
 			toggleRaw: function () {
 				this.toggle(keyShowRaw);
 				var show = this.get(keyShowRaw);
-				
+
 				// send current values back and forth
 				if (show) setRaw(this.get(keyItems));
 				else this.set(keyItems, getRaw());
