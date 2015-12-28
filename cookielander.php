@@ -129,7 +129,7 @@ class Cookielander {
 	}
 	
 	function set_cookies($cookies) {
-		$expires = CookielanderOptions::settings()[CookielanderOptions::F_EXPIRES];
+		$expires = CookielanderOptions::settings(CookielanderOptions::F_EXPIRES);
 		
 		foreach($cookies as $path => $value) {
 			//parse for path, expiration, etc

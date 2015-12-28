@@ -135,8 +135,10 @@ class CookielanderOptions {
 
 	#region ------------- settings, singleton --------------
 
-	public static function settings() {
-		return get_option( static::N );
+	public static function settings($key = null) {
+		$settings = get_option( static::N );
+		if(null == $key) return $settings;
+		return isset($settings[$key]) ? $settings[$key] : null;
 	}
 
 	private static $instance;
