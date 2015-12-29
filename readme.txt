@@ -16,17 +16,16 @@ Allows you to specify which querystring, post, header, or cookie parameters to s
 == Installation ==
 
 1. Unzip/upload plugin folder to your plugins directory (`/wp-content/plugins/`)
-2. Make sure [Forms 3rdparty Integration](http://wordpress.org/plugins/forms-3rdparty-integration/) is installed and settings have been saved at least once.
-3. Activate this plugin
-4. Determine which referral variables to look for:
+2. Activate this plugin
+3. Determine which referral variables to look for:
    * in the querystring or post ("request")
    * in headers
    * in cookies
-5. Determine where to save those variables:
+4. Determine where to save those variables:
    * in the session
    * in a cookie
    * in a header
-6. If saving to a cookie, you may:
+5. If saving to a cookie, you may:
 	* leave the destination key blank to reuse the source key
 	* specify 'name', 'path', 'domain', 'expires', etc by entering them as url-querystring format corresponding to the [`setcookie` parameters](http://php.net/manual/en/function.setcookie.php).  ex `name=foobar@expires=700000`.
 
