@@ -3,15 +3,16 @@
 
 Plugin Name: Cookie-Lander
 Plugin URI: https://github.com/zaus/cookielander
-Description: Save referral variables to temporary storage (cookies)
+Description: Save referral variables to temporary storage (cookies, session, etc)
 Author: zaus
-Version: 0.4
+Version: 0.5
 Author URI: http://drzaus.com
 Changelog:
 	0.1	initial
-	0.2 semi-standard options page
-	0.3 dynamic admin ui (ractive)
-	0.4 saves parameters
+	0.2	semi-standard options page
+	0.3	dynamic admin ui (ractive)
+	0.4	saves parameters
+	0.5	session source
 */
 
 class Cookielander {
@@ -46,8 +47,9 @@ class Cookielander {
 		$headersDest = array();
 		
 		foreach($settings[CookielanderOptions::F_RAW] as $i => $setting) {
-			extract($setting); // easier access
-			
+			$src_t = $src = $dest_t = $dest = null; // extract causes undefined variable warning...meh
+			extract($setting, EXTR_IF_EXISTS); // easier access
+
 			switch($src_t) {
 				case 'req':
 				case 'get':
@@ -59,6 +61,10 @@ class Cookielander {
 					break;
 				case 'cookie':
 					$source = $_COOKIE;
+					break;
+				case 'session':
+					$this->start_session();
+					$source = $_SESSION;
 					break;
 				default:
 					$source = $emptySource;

@@ -74,8 +74,8 @@
 								<div class="radios">
 									<label><input type='radio' value='get' checked name='{{.src_t}}' /> <b>Request</b></label>
 									<label><input type='radio' value='cookie' name='{{.src_t}}' /> <b>Cookie</b></label>
+									<label><input type='radio' value='session' name='{{.src_t}}' /> <b>Session</b></label>
 									<label><input type='radio' value='header' name='{{.src_t}}' /> <b>Header</b></label>
-
 								</div>
 									
 								<label><b>Key:</b> <input id='src-{{@index}}' value='{{.src}}' /></label>

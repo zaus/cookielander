@@ -21,6 +21,7 @@ Allows you to specify which querystring, post, header, or cookie parameters to s
    * in the querystring or post ("request")
    * in headers
    * in cookies
+   * in the session
 4. Determine where to save those variables:
    * in the session
    * in a cookie
@@ -40,6 +41,9 @@ Drop an issue at https://github.com/zaus/cookielander
 N/A.
 
 == Changelog ==
+
+= 0.5 =
+* session now available as source
 
 = 0.4 =
 * dynamic UI
