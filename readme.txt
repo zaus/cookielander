@@ -3,7 +3,7 @@ Contributors: zaus
 Donate link: http://drzaus.com/donate
 Tags: contact form, ppc, landing page, cookies, landing referrer, referral
 Requires at least: 3.0
-Tested up to: 4.3
+Tested up to: 4.5.4
 Stable tag: trunk
 License: GPLv2 or later
 
@@ -29,6 +29,7 @@ Allows you to specify which querystring, post, header, or cookie parameters to s
 5. If saving to a cookie, you may:
 	* leave the destination key blank to reuse the source key
 	* specify 'name', 'path', 'domain', 'expires', etc by entering them as url-querystring format corresponding to the [`setcookie` parameters](http://php.net/manual/en/function.setcookie.php).  ex `name=foobar@expires=700000`.
+6. If retrieving value from a GET parameter, you may force a server-side redirect to remove it
 
 == Frequently Asked Questions ==
 
@@ -41,6 +42,9 @@ Drop an issue at https://github.com/zaus/cookielander
 N/A.
 
 == Changelog ==
+
+= 0.6 =
+* optional redirect to remove GET params
 
 = 0.5 =
 * session now available as source

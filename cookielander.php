@@ -5,7 +5,7 @@ Plugin Name: Cookie-Lander
 Plugin URI: https://github.com/zaus/cookielander
 Description: Save referral variables to temporary storage (cookies, session, etc)
 Author: zaus
-Version: 0.5
+Version: 0.6
 Author URI: http://drzaus.com
 Changelog:
 	0.1	initial
@@ -13,6 +13,7 @@ Changelog:
 	0.3	dynamic admin ui (ractive)
 	0.4	saves parameters
 	0.5	session source
+	0.6	redir option
 */
 
 class Cookielander {
@@ -104,6 +105,23 @@ class Cookielander {
 		}
 		if(!empty($cookiesDest)) {
 			$this->set_cookies($cookiesDest);
+		}
+
+		// remove GET params
+		if( isset($settings[CookielanderOptions::F_301]) && $settings[CookielanderOptions::F_301] ) {
+			$url = false;
+			$redir = false;
+			foreach($settings[CookielanderOptions::F_RAW] as $i => $setting) {
+				if($setting['src_t'] != 'get' || !isset($_GET[$setting['src']])) continue;
+
+				// https://developer.wordpress.org/reference/functions/remove_query_arg/
+				$url = remove_query_arg($src, $url);
+				$redir = true;
+			}
+
+			if($redir && wp_redirect( $url )) {
+				exit;
+			}
 		}
 	}//--	fn	trap
 

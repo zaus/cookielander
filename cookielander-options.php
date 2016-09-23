@@ -26,6 +26,7 @@ class CookielanderOptions {
 
 	const F_RAW = 'json';
 	const F_EXPIRES = 'expires';
+	const F_301 = 'r301';
 	
 	function add_settings($page) {
 		add_action( 'admin_enqueue_scripts', array(&$this, 'scripts') );
@@ -54,7 +55,15 @@ class CookielanderOptions {
 			$page, 
 			$section 
 		);
-		
+
+		add_settings_field(
+			self::F_301,
+			__( 'Redirect?', static::X ),
+			array(&$this, 'render_redirect'),
+			$page,
+			$section
+		);
+
 	}
 	
 	function scripts() {
@@ -98,6 +107,18 @@ class CookielanderOptions {
 		$this->renderInput(self::F_EXPIRES, 7 * DAY_IN_SECONDS);
 		echo '<em>seconds</em>';
 	}
+
+	function render_redirect(  ) {
+		// dump all the setings out as JSON
+
+		$field = self::F_301;
+		$options = self::settings();
+
+		?>
+		<input type="checkbox" name='<?php echo static::N, '[', $field ?>]' value="1" <?php checked($options[$field], 1) ?> />
+		<?php
+	}
+
 
 	function sanitize($val) {
 		### _log('sanitizing ' . static::N . '.' . self::F_RAW, $val);
