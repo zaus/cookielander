@@ -67,7 +67,8 @@ class CookielanderOptions {
 	}
 	
 	function scripts() {
-		wp_enqueue_script( 'ractive', '//cdn.ractivejs.org/latest/ractive.js', null, '0.8', false );
+		// don't use latest, may break compatibility with decorator (//cdn.ractivejs.org/latest/ractive.js)
+		wp_enqueue_script( 'ractive', '//cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js', null, '0.8', false );
 		wp_enqueue_script( 'ractive-addable', plugins_url('/Ractive-decorators-addable.js', __FILE__), array('ractive'), '1.0', false );
 		wp_enqueue_script( static::N, plugins_url('/cookielander.js', __FILE__), array('ractive', 'ractive-addable'), '1.0', false );
 		wp_localize_script( static::N, 'cookielander', array(

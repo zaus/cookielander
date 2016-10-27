@@ -5,7 +5,7 @@ Plugin Name: Cookie-Lander
 Plugin URI: https://github.com/zaus/cookielander
 Description: Save referral variables to temporary storage (cookies, session, etc)
 Author: zaus
-Version: 0.6
+Version: 0.7
 Author URI: http://drzaus.com
 Changelog:
 	0.1	initial
@@ -14,6 +14,7 @@ Changelog:
 	0.4	saves parameters
 	0.5	session source
 	0.6	redir option
+	0.7	dumb redir bugfixes, locked ractive version 0.7.3
 */
 
 class Cookielander {
@@ -34,8 +35,9 @@ class Cookielander {
 
 	public function trap() {
 		$settings = CookielanderOptions::settings();
-		
-		### _log(__CLASS__, $settings);
+
+
+		### _log(__CLASS__, $settings, $_SERVER['REQUEST_URI']); // some weird suggestions for getting current page http://mekshq.com/get-current-page-url-wordpress/
 
 		// nothing to do...leave
 		if(empty($settings) || !isset($settings[CookielanderOptions::F_RAW]) || empty($settings[CookielanderOptions::F_RAW])) return;
@@ -46,7 +48,9 @@ class Cookielander {
 		$cookiesDest = array();
 		$sessionDest = array();
 		$headersDest = array();
-		
+
+		$redirs = isset($settings[CookielanderOptions::F_301]) && $settings[CookielanderOptions::F_301] ? array() : false;
+
 		foreach($settings[CookielanderOptions::F_RAW] as $i => $setting) {
 			$src_t = $src = $dest_t = $dest = null; // extract causes undefined variable warning...meh
 			extract($setting, EXTR_IF_EXISTS); // easier access
@@ -55,6 +59,7 @@ class Cookielander {
 				case 'req':
 				case 'get':
 					$source = $_REQUEST; // WP already combined get/post
+					if($redirs !== false) $redirs []= $src;
 					break;
 				case 'header':
 					if($headerSource === false) $headerSource = $this->getheaders(); // populate on first request
@@ -108,20 +113,17 @@ class Cookielander {
 		}
 
 		// remove GET params
-		if( isset($settings[CookielanderOptions::F_301]) && $settings[CookielanderOptions::F_301] ) {
+		if($redirs !== false) {
+			### _log(__CLASS__ . '.' . __FUNCTION__ . ':' . __LINE__, $redirs);
+
+			// https://developer.wordpress.org/reference/functions/remove_query_arg/
 			$url = false;
-			$redir = false;
-			foreach($settings[CookielanderOptions::F_RAW] as $i => $setting) {
-				if($setting['src_t'] != 'get' || !isset($_GET[$setting['src']])) continue;
-
-				// https://developer.wordpress.org/reference/functions/remove_query_arg/
-				$url = remove_query_arg($src, $url);
-				$redir = true;
+			foreach($redirs as $src) {
+				// could technically call remove with the array directly,
+				// but we don't want to redirect if the arg wasn't there in the first place
+				if(isset($_GET[$src])) $url = remove_query_arg($src, $url);
 			}
-
-			if($redir && wp_redirect( $url )) {
-				exit;
-			}
+			if($url && wp_redirect( $url )) exit;
 		}
 	}//--	fn	trap
 

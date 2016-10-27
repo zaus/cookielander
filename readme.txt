@@ -43,6 +43,10 @@ N/A.
 
 == Changelog ==
 
+= 0.7 =
+* redirection bugfixes
+* locked ractive to v0.7.3 to work with addable decorator (latest breaks it)
+
 = 0.6 =
 * optional redirect to remove GET params
 
